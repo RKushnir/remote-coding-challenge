@@ -3,15 +3,15 @@ defmodule TwoInAMillion.Users do
   Create, modify and search users.
   """
 
+  alias TwoInAMillion.Repo
   alias TwoInAMillion.Users.User
+  import Ecto.Query, only: [from: 2]
 
   @doc """
-  Find a _count_ number of users that have more points than _min_points_.
+  Find at most a _count_ number of users that have more points than _min_points_.
   """
-  def find_all_with_points_above(_min_points, count: _count) do
-    [
-      %User{id: 1, points: 30},
-      %User{id: 72, points: 30}
-    ]
+  def find_all_with_points_above(min_points, count: count) do
+    from([u] in User, where: u.points > ^min_points, limit: ^count)
+    |> Repo.all()
   end
 end

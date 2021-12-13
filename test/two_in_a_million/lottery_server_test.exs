@@ -1,8 +1,8 @@
 defmodule TwoInAMillion.LotteryServerTest do
-  use ExUnit.Case, async: true
+  use TwoInAMillion.DataCase, async: true
 
   alias TwoInAMillion.LotteryServer
-  alias TwoInAMillion.Users.User
+  alias TwoInAMillion.Repo
 
   describe "pick_winners/2" do
     def start_server(name) do
@@ -11,16 +11,20 @@ defmodule TwoInAMillion.LotteryServerTest do
         start: {LotteryServer, :start_link, [[], [name: name]]}
       }
 
-      start_supervised!(server_spec)
+      pid = start_supervised!(server_spec)
+      Ecto.Adapters.SQL.Sandbox.allow(Repo, self(), pid)
+      pid
     end
 
-    test "returns 2 users and the current timestamp" do
+    test "returns at most 2 users and the current timestamp" do
       pid = start_server(RiggedLottery1)
 
       assert %{
-               users: [%User{}, %User{}],
+               users: users,
                timestamp: nil
              } = LotteryServer.pick_winners(2, pid)
+
+      assert length(users) <= 2
     end
 
     test "updates the timestamp" do

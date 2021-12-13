@@ -48,4 +48,11 @@ defmodule TwoInAMillion.DataCase do
       end)
     end)
   end
+
+  @doc """
+  Allows to conveniently create a user with the given number of points.
+  """
+  def create_user(points: points) do
+    TwoInAMillion.Repo.insert!(%TwoInAMillion.Users.User{points: points})
+  end
 end

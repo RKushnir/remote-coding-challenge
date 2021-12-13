@@ -6,10 +6,7 @@ defmodule TwoInAMillionWeb.UserControllerTest do
 
     assert %{
              "timestamp" => _timestamp,
-             "users" => [
-               %{"id" => _id1, "points" => _points1},
-               %{"id" => _id2, "points" => _points2}
-             ]
+             "users" => _users
            } = json_response(conn, 200)
   end
 end
