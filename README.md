@@ -1,19 +1,15 @@
-# TwoInAMillion
+# Two In A Million: A Coding Challenge
 
-To start your Phoenix server:
+For convenience, the recommended way to start the server is by using Docker, if you have it installed.
+Run `docker compose up` and wait until the command stops producing output and
+one of the final lines says "Running … at 0.0.0.0:3000 (http)".
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+Alternatively, you can run the app on your host machine.
+First, please, make sure that you have PostgreSQL installed and listening on port 5432,
+and set the environment variables POSTGRES_USER and POSTGRES_PASSWORD to contain the DB server credentials.
+Then, run the server as follows:
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+  * `mix setup` to install dependencies and prepare the database,
+  * `mix phx.server` to start the Phoenix endpoint.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+Either way, once you have the server running, you can visit [`localhost:3000`](http://localhost:3000) from your browser.

@@ -1,0 +1,21 @@
+FROM elixir:1.13
+
+RUN apt-get update; \
+    apt-get install -y --no-install-recommends \
+        git \
+        inotify-tools
+
+RUN mkdir -p /opt/app && \
+    chmod -R 777 /opt/app
+
+RUN mix local.hex --force; \
+    mix local.rebar --force
+
+WORKDIR /opt/app
+COPY . .
+ENV PORT 3000
+
+EXPOSE ${PORT}
+
+ENTRYPOINT ["./docker-entrypoint-dev.sh"]
+CMD ["start"]

@@ -2,10 +2,7 @@ import Config
 
 # Configure your database
 config :two_in_a_million, TwoInAMillion.Repo,
-  username: "postgres",
-  password: "postgres",
   database: "two_in_a_million_dev",
-  hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
@@ -15,10 +12,12 @@ config :two_in_a_million, TwoInAMillion.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with esbuild to bundle .js and .css sources.
+http_port = System.get_env("PORT", "3000") |> String.to_integer()
+
 config :two_in_a_million, TwoInAMillionWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  http: [ip: {0, 0, 0, 0}, port: http_port],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,

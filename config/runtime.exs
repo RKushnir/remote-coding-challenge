@@ -12,6 +12,13 @@ if System.get_env("PHX_SERVER") && System.get_env("RELEASE_NAME") do
   config :two_in_a_million, TwoInAMillionWeb.Endpoint, server: true
 end
 
+if config_env() in [:dev, :test] do
+  config :two_in_a_million, TwoInAMillion.Repo,
+    username: System.get_env("POSTGRES_USER", "postgres"),
+    password: System.get_env("POSTGRES_PASSWORD", "postgres"),
+    hostname: System.get_env("POSTGRES_HOST", "localhost")
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -41,7 +48,7 @@ if config_env() == :prod do
       """
 
   host = System.get_env("PHX_HOST") || "example.com"
-  port = String.to_integer(System.get_env("PORT") || "4000")
+  port = String.to_integer(System.get_env("PORT") || "3000")
 
   config :two_in_a_million, TwoInAMillionWeb.Endpoint,
     url: [host: host, port: 443],
