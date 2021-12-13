@@ -29,7 +29,7 @@ defmodule TwoInAMillion.LotteryServer do
   @impl GenServer
   def init(arg) do
     state = %State{
-      max_number: Keyword.get(arg, :max_number, generate_random_number()),
+      max_number: Keyword.get_lazy(arg, :max_number, &generate_random_number/0),
       timestamp: Keyword.get(arg, :timestamp)
     }
 
@@ -52,5 +52,9 @@ defmodule TwoInAMillion.LotteryServer do
     {:reply, response, new_state}
   end
 
-  defp generate_random_number, do: Enum.random(0..100)
+  defp generate_random_number, do: number_generator().get_next_number(0..100)
+
+  defp number_generator do
+    Application.fetch_env!(:two_in_a_million, __MODULE__)[:number_generator]
+  end
 end
