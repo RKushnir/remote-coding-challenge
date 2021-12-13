@@ -1,5 +1,5 @@
 defmodule TwoInAMillion.LotteryServerTest do
-  use TwoInAMillion.DataCase, async: false
+  use TwoInAMillion.DataCase, async: true
 
   alias TwoInAMillion.LotteryServer
   alias TwoInAMillion.RandomNumberGeneratorMock
@@ -8,30 +8,14 @@ defmodule TwoInAMillion.LotteryServerTest do
   import Mox
 
   describe "pick_winners/2" do
-    setup do
-      server_config = Application.fetch_env!(:two_in_a_million, LotteryServer)
-
-      Application.put_env(
-        :two_in_a_million,
-        LotteryServer,
-        Keyword.put(server_config, :number_generator, RandomNumberGeneratorMock)
-      )
-
-      on_exit(fn ->
-        Application.put_env(
-          :two_in_a_million,
-          LotteryServer,
-          server_config
-        )
-      end)
-    end
-
     def start_server(name, opts \\ []) do
       max_number = Keyword.get(opts, :max_number, 0)
 
       server_spec = %{
         id: name,
-        start: {LotteryServer, :start_link, [[max_number: max_number], [name: name]]}
+        start:
+          {LotteryServer, :start_link,
+           [[max_number: max_number, number_generator: RandomNumberGeneratorMock], [name: name]]}
       }
 
       server_pid = start_supervised!(server_spec)

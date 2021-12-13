@@ -14,6 +14,7 @@ defmodule TwoInAMillion.LotteryServer do
   end
 
   alias TwoInAMillion.Users
+  alias TwoInAMillion.RandomNumberGenerator
 
   def start_link(arg, opts \\ []) do
     name = Keyword.get(opts, :name, @default_name)
@@ -28,8 +29,11 @@ defmodule TwoInAMillion.LotteryServer do
 
   @impl GenServer
   def init(arg) do
+    number_generator = Keyword.get(arg, :number_generator, RandomNumberGenerator)
+
     state = %State{
-      max_number: Keyword.get_lazy(arg, :max_number, &generate_random_number/0),
+      max_number:
+        Keyword.get_lazy(arg, :max_number, fn -> generate_random_number(number_generator) end),
       timestamp: Keyword.get(arg, :timestamp)
     }
 
@@ -52,9 +56,6 @@ defmodule TwoInAMillion.LotteryServer do
     {:reply, response, new_state}
   end
 
-  defp generate_random_number, do: number_generator().get_next_number(0..100)
-
-  defp number_generator do
-    Application.fetch_env!(:two_in_a_million, __MODULE__)[:number_generator]
-  end
+  defp generate_random_number(number_generator),
+    do: number_generator.get_next_number(0..100)
 end

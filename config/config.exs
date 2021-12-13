@@ -26,9 +26,6 @@ config :two_in_a_million, TwoInAMillionWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :two_in_a_million, TwoInAMillion.Mailer, adapter: Swoosh.Adapters.Local
 
-config :two_in_a_million, TwoInAMillion.LotteryServer,
-  number_generator: TwoInAMillion.RandomNumberGenerator
-
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false
 
