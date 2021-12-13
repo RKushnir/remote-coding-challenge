@@ -23,4 +23,41 @@ defmodule TwoInAMillion.UsersTest do
       assert user2 in users
     end
   end
+
+  describe "randomize_all_points/1" do
+    # This test, in theory, might fail (flaky).
+    # Due to the randomness of generated numbers we cannot expect an exact distribution of values.
+    # Even when setting a seed, implementations of random() may differ between DB servers.
+    # In practice, we expect a reasonable generator to not produce the same value
+    # in the majority of cases.
+    test "updates each user's points with a random value within the valid range" do
+      users = [
+        create_user(points: 0),
+        create_user(points: 0),
+        create_user(points: 0),
+        create_user(points: 0),
+        create_user(points: 0),
+        create_user(points: 0),
+        create_user(points: 0)
+      ]
+
+      points_range = 10..90
+      Users.reset_seed(0.5)
+
+      Users.randomize_all_points(points_range)
+
+      updated_points_list = Enum.map(users, &reload_record(&1).points)
+
+      max_duplicates =
+        updated_points_list
+        |> Enum.group_by(& &1)
+        |> Enum.map(&length(elem(&1, 1)))
+        |> Enum.max()
+
+      # Verify that no single value is assigned to the majority of users.
+      assert max_duplicates < length(users) / 2
+
+      assert Enum.all?(updated_points_list, &(&1 in points_range))
+    end
+  end
 end

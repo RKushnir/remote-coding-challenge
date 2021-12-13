@@ -29,6 +29,7 @@ defmodule TwoInAMillion.LotteryServer do
 
   @impl GenServer
   def init(arg) do
+    round_duration = Keyword.get(arg, :round_duration, default_round_duration())
     number_generator = Keyword.get(arg, :number_generator, RandomNumberGenerator)
 
     state = %State{
@@ -36,6 +37,8 @@ defmodule TwoInAMillion.LotteryServer do
         Keyword.get_lazy(arg, :max_number, fn -> generate_random_number(number_generator) end),
       timestamp: Keyword.get(arg, :timestamp)
     }
+
+    schedule_next_round(round_duration: round_duration, number_generator: number_generator)
 
     {:ok, state}
   end
@@ -56,6 +59,33 @@ defmodule TwoInAMillion.LotteryServer do
     {:reply, response, new_state}
   end
 
+  @impl GenServer
+  def handle_info({:start_new_round, opts}, state) do
+    Users.randomize_all_points(points_range())
+    schedule_next_round(opts)
+
+    {:noreply, state}
+  end
+
+  defp schedule_next_round(opts) do
+    round_duration = Keyword.fetch!(opts, :round_duration)
+
+    Process.send_after(
+      self(),
+      {:start_new_round, opts},
+      round_duration
+    )
+  end
+
   defp generate_random_number(number_generator),
-    do: number_generator.get_next_number(0..100)
+    do: number_generator.get_next_number(points_range())
+
+  defp default_round_duration, do: fetch_config!(:round_duration)
+
+  defp points_range, do: fetch_config!(:points_range)
+
+  def fetch_config!(key) do
+    config = Application.fetch_env!(:two_in_a_million, __MODULE__)
+    Keyword.fetch!(config, key)
+  end
 end
