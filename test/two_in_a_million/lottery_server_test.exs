@@ -1,7 +1,8 @@
 defmodule TwoInAMillion.LotteryServerTest do
   use ExUnit.Case, async: true
 
-  alias TwoInAMillion.{LotteryServer, User}
+  alias TwoInAMillion.LotteryServer
+  alias TwoInAMillion.Users.User
 
   describe "pick_winners/2" do
     def start_server(name) do

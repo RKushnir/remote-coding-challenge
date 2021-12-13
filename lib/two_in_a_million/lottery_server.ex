@@ -7,7 +7,7 @@ defmodule TwoInAMillion.LotteryServer do
     defstruct [:max_number, :timestamp]
   end
 
-  alias TwoInAMillion.User
+  alias TwoInAMillion.Users
 
   def start_link(arg, opts \\ []) do
     name = Keyword.get(opts, :name, @default_name)
@@ -31,12 +31,13 @@ defmodule TwoInAMillion.LotteryServer do
   end
 
   @impl GenServer
-  def handle_call({:pick_winners, _count}, _from, %State{timestamp: old_timestamp} = state) do
+  def handle_call(
+        {:pick_winners, count},
+        _from,
+        %State{timestamp: old_timestamp, max_number: max_number} = state
+      ) do
     response = %{
-      users: [
-        %User{id: 1, points: 30},
-        %User{id: 72, points: 30}
-      ],
+      users: Users.find_all_with_points_above(max_number, count: count),
       timestamp: old_timestamp
     }
 
