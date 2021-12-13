@@ -10,4 +10,5 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
+TwoInAMillion.Repo.delete_all(TwoInAMillion.Users.User)
 TwoInAMillion.Users.create_default(count: 1_000_000)
