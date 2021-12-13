@@ -1,4 +1,4 @@
-defmodule TwoInAMillionWeb.UserView do
+defmodule TwoInAMillionWeb.LotteryView do
   @moduledoc """
   UserView renders the controller's response as JSON.
   """

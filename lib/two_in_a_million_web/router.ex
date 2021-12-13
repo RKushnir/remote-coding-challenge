@@ -8,6 +8,6 @@ defmodule TwoInAMillionWeb.Router do
   scope "/", TwoInAMillionWeb do
     pipe_through :api
 
-    get "/", UserController, :index
+    get "/", LotteryController, :index
   end
 end

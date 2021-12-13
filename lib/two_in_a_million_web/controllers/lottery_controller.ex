@@ -1,4 +1,4 @@
-defmodule TwoInAMillionWeb.UserController do
+defmodule TwoInAMillionWeb.LotteryController do
   @moduledoc """
   UserController queries the LotteryServer and returns the server's response.
   """

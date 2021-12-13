@@ -1,4 +1,4 @@
-defmodule TwoInAMillionWeb.UserControllerTest do
+defmodule TwoInAMillionWeb.LotteryControllerTest do
   use TwoInAMillionWeb.ConnCase
 
   import TwoInAMillion.UserFactory, only: [create_users: 2]
