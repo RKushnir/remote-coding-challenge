@@ -10,6 +10,8 @@ defmodule TwoInAMillion.LotteryServer do
   @default_name __MODULE__
 
   defmodule State do
+    @moduledoc "Server's state."
+
     defstruct [:max_number, :timestamp]
   end
 
