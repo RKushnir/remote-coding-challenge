@@ -26,6 +26,10 @@ defmodule TwoInAMillion.UsersTest do
   end
 
   describe "randomize_all_points/1" do
+    defp set_db_random_seed(seed) do
+      Ecto.Adapters.SQL.query!(Repo, "SELECT setseed($1)", [seed])
+    end
+
     # This test, in theory, might fail (flaky).
     # Due to the randomness of generated numbers we cannot expect an exact distribution of values.
     # Even when setting a seed, implementations of random() may differ between DB servers.
@@ -43,7 +47,7 @@ defmodule TwoInAMillion.UsersTest do
       ]
 
       points_range = 10..90
-      Users.reset_seed(0.5)
+      set_db_random_seed(0.5)
 
       Users.randomize_all_points(points_range)
 

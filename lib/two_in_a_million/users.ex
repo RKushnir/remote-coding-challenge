@@ -44,11 +44,4 @@ defmodule TwoInAMillion.Users do
       [count]
     )
   end
-
-  @doc """
-  Sets a new seed for the database random generator.
-  """
-  def reset_seed(seed) do
-    Ecto.Adapters.SQL.query!(Repo, "SELECT setseed($1)", [seed])
-  end
 end
