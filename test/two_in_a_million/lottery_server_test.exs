@@ -3,17 +3,34 @@ defmodule TwoInAMillion.LotteryServerTest do
 
   alias TwoInAMillion.{LotteryServer, User}
 
-  test "pick_winners/2 returns 2 users and a timestamp" do
-    server_spec = %{
-      id: RiggedLottery,
-      start: {LotteryServer, :start_link, [[], [name: RiggedLottery]]}
-    }
+  describe "pick_winners/2" do
+    def start_server(name) do
+      server_spec = %{
+        id: name,
+        start: {LotteryServer, :start_link, [[], [name: name]]}
+      }
 
-    start_supervised(server_spec)
+      start_supervised!(server_spec)
+    end
 
-    assert %{
-             users: [%User{}, %User{}],
-             timestamp: _timestamp
-           } = LotteryServer.pick_winners(2, RiggedLottery)
+    test "returns 2 users and the current timestamp" do
+      pid = start_server(RiggedLottery1)
+
+      assert %{
+               users: [%User{}, %User{}],
+               timestamp: nil
+             } = LotteryServer.pick_winners(2, pid)
+    end
+
+    test "updates the timestamp" do
+      pid = start_server(RiggedLottery2)
+
+      LotteryServer.pick_winners(2, pid)
+
+      assert %{timestamp: %DateTime{} = timestamp1} = LotteryServer.pick_winners(2, pid)
+      assert %{timestamp: %DateTime{} = timestamp2} = LotteryServer.pick_winners(2, pid)
+
+      assert DateTime.compare(timestamp1, timestamp2) == :lt
+    end
   end
 end

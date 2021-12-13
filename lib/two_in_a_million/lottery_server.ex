@@ -40,7 +40,9 @@ defmodule TwoInAMillion.LotteryServer do
       timestamp: old_timestamp
     }
 
-    {:reply, response, state}
+    new_state = %{state | timestamp: DateTime.utc_now()}
+
+    {:reply, response, new_state}
   end
 
   defp generate_random_number, do: Enum.random(0..100)
