@@ -95,7 +95,6 @@ defmodule TwoInAMillionWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
-      import TwoInAMillionWeb.ErrorHelpers
       import TwoInAMillionWeb.Gettext
       alias TwoInAMillionWeb.Router.Helpers, as: Routes
     end

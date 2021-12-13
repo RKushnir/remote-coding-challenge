@@ -4,6 +4,8 @@ defmodule TwoInAMillion.UsersTest do
   alias TwoInAMillion.Repo
   alias TwoInAMillion.Users
 
+  import TwoInAMillion.UserFactory
+
   describe "find_all_with_points_above/2" do
     test "returns at most _count_ users who have more points than _min_points_" do
       _user1 = create_user(points: 10)

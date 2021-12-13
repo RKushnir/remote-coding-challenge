@@ -4,6 +4,8 @@ defmodule TwoInAMillion.LotteryServerTest do
   alias TwoInAMillion.LotteryServer
   alias TwoInAMillion.Repo
 
+  import TwoInAMillion.UserFactory
+
   defp start_server(name, opts \\ []) do
     opts = Keyword.put_new(opts, :max_number, 0)
     opts = Keyword.put_new(opts, :randomize_points_fun, fn _ -> [] end)

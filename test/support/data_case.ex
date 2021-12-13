@@ -50,13 +50,6 @@ defmodule TwoInAMillion.DataCase do
   end
 
   @doc """
-  Allows to conveniently create a user with the given number of points.
-  """
-  def create_user(points: points) do
-    TwoInAMillion.Repo.insert!(%TwoInAMillion.Users.User{points: points})
-  end
-
-  @doc """
   Fetches a new copy of the record from the database.
   """
   def reload_record(%schema{id: id}), do: TwoInAMillion.Repo.get(schema, id)
