@@ -12,6 +12,6 @@ defmodule TwoInAMillion.UserFactory do
   Allows to create multiple users with the same given number of points.
   """
   def create_users(count, points: points) do
-    Enum.each(1..count, fn _ -> create_user(points: points) end)
+    Enum.map(1..count, fn _ -> create_user(points: points) end)
   end
 end

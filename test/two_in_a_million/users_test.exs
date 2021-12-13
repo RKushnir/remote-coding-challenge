@@ -38,16 +38,7 @@ defmodule TwoInAMillion.UsersTest do
     # In practice, we expect a reasonable generator to not produce the same value
     # in the majority of cases.
     test "updates each user's points with a random value within the valid range" do
-      users = [
-        create_user(points: 0),
-        create_user(points: 0),
-        create_user(points: 0),
-        create_user(points: 0),
-        create_user(points: 0),
-        create_user(points: 0),
-        create_user(points: 0)
-      ]
-
+      users = create_users(7, points: 0)
       points_range = 10..90
       set_db_random_seed(0.5)
 
