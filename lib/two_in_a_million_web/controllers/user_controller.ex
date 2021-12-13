@@ -1,4 +1,8 @@
 defmodule TwoInAMillionWeb.UserController do
+  @moduledoc """
+  UserController queries the LotteryServer and returns the server's response.
+  """
+
   use TwoInAMillionWeb, :controller
 
   alias TwoInAMillion.LotteryServer

@@ -1,4 +1,10 @@
 defmodule TwoInAMillion.LotteryServer do
+  @moduledoc """
+  LotteryServer regularly randomizes the points of all users and the winning threshold.
+  It responds with a list of users who satisfy the winning criteria
+  and a timestamp of a previous request.
+  """
+
   use GenServer
 
   @default_name __MODULE__
