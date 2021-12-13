@@ -15,9 +15,9 @@ defmodule TwoInAMillion.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: TwoInAMillion.PubSub},
       # Start the Endpoint (http/https)
-      TwoInAMillionWeb.Endpoint
+      TwoInAMillionWeb.Endpoint,
       # Start a worker by calling: TwoInAMillion.Worker.start_link(arg)
-      # {TwoInAMillion.Worker, arg}
+      TwoInAMillion.LotteryServer
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
