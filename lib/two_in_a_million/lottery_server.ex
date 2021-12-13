@@ -7,6 +7,8 @@ defmodule TwoInAMillion.LotteryServer do
     defstruct [:max_number, :timestamp]
   end
 
+  alias TwoInAMillion.User
+
   def start_link(arg, opts \\ []) do
     name = Keyword.get(opts, :name, @default_name)
     GenServer.start_link(__MODULE__, arg, name: name)
@@ -32,8 +34,8 @@ defmodule TwoInAMillion.LotteryServer do
   def handle_call({:pick_winners, _count}, _from, %State{timestamp: old_timestamp} = state) do
     response = %{
       users: [
-        %{id: 1, points: 30},
-        %{id: 72, points: 30}
+        %User{id: 1, points: 30},
+        %User{id: 72, points: 30}
       ],
       timestamp: old_timestamp
     }
