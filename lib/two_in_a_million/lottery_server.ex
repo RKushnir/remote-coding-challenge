@@ -14,7 +14,6 @@ defmodule TwoInAMillion.LotteryServer do
   end
 
   alias TwoInAMillion.Users
-  alias TwoInAMillion.RandomNumberGenerator
 
   def start_link(arg, opts \\ []) do
     name = Keyword.get(opts, :name, @default_name)
@@ -65,7 +64,7 @@ defmodule TwoInAMillion.LotteryServer do
   def handle_info({:start_new_round, opts}, state) do
     number_generator = Keyword.fetch!(opts, :number_generator)
     randomize_points_fun = Keyword.fetch!(opts, :randomize_points_fun)
-    new_max_number = generate_random_number(number_generator)
+    new_max_number = number_generator.(points_range())
 
     randomize_points_fun.(points_range())
     schedule_next_round(opts)
@@ -84,13 +83,10 @@ defmodule TwoInAMillion.LotteryServer do
     )
   end
 
-  defp generate_random_number(number_generator),
-    do: number_generator.get_next_number(points_range())
-
   defp default_options do
     [
       round_duration: fetch_config!(:round_duration),
-      number_generator: RandomNumberGenerator,
+      number_generator: &Enum.random/1,
       randomize_points_fun: &Users.randomize_all_points/1
     ]
   end

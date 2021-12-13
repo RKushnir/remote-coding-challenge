@@ -2,15 +2,11 @@ defmodule TwoInAMillion.LotteryServerTest do
   use TwoInAMillion.DataCase, async: true
 
   alias TwoInAMillion.LotteryServer
-  alias TwoInAMillion.RandomNumberGeneratorMock
   alias TwoInAMillion.Repo
-
-  import Mox
 
   defp start_server(name, opts \\ []) do
     opts = Keyword.put_new(opts, :max_number, 0)
     opts = Keyword.put_new(opts, :randomize_points_fun, fn _ -> [] end)
-    opts = Keyword.put(opts, :number_generator, RandomNumberGeneratorMock)
 
     server_spec = %{
       id: name,
@@ -19,20 +15,7 @@ defmodule TwoInAMillion.LotteryServerTest do
 
     server_pid = start_supervised!(server_spec)
     Ecto.Adapters.SQL.Sandbox.allow(Repo, self(), server_pid)
-    allow(RandomNumberGeneratorMock, self(), server_pid)
     server_pid
-  end
-
-  defp stub_next_random_number(next_number) do
-    RandomNumberGeneratorMock
-    |> stub(:get_next_number, fn _range -> next_number end)
-  end
-
-  setup :set_mox_from_context
-
-  setup do
-    stub_next_random_number(0)
-    :ok
   end
 
   describe "pick_winners/2" do
@@ -107,7 +90,7 @@ defmodule TwoInAMillion.LotteryServerTest do
 
       opts = [
         round_duration: 1_000,
-        number_generator: RandomNumberGeneratorMock,
+        number_generator: fn _ -> 1 end,
         randomize_points_fun: fake_randomize_fun
       ]
 
@@ -117,14 +100,11 @@ defmodule TwoInAMillion.LotteryServerTest do
     end
 
     test "updates the winning threshold" do
-      RandomNumberGeneratorMock
-      |> stub(:get_next_number, fn _range -> 20 end)
-
       old_state = %LotteryServer.State{max_number: 0}
 
       opts = [
         round_duration: 1_000,
-        number_generator: RandomNumberGeneratorMock,
+        number_generator: fn _range -> 20 end,
         randomize_points_fun: fn _ -> [] end
       ]
 
