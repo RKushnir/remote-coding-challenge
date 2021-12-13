@@ -19,7 +19,7 @@ defmodule TwoInAMillion.Users do
   Changes points of every user to a new random value.
   """
   def randomize_all_points(range) do
-    %{first: min_value, last: max_value} = range
+    min_value..max_value = range
 
     Repo.update_all(
       from(User,
