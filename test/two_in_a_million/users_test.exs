@@ -1,6 +1,7 @@
 defmodule TwoInAMillion.UsersTest do
   use TwoInAMillion.DataCase, async: true
 
+  alias TwoInAMillion.Repo
   alias TwoInAMillion.Users
 
   describe "find_all_with_points_above/2" do
@@ -58,6 +59,19 @@ defmodule TwoInAMillion.UsersTest do
       assert max_duplicates < length(users) / 2
 
       assert Enum.all?(updated_points_list, &(&1 in points_range))
+    end
+  end
+
+  describe "create_default/1" do
+    test "creates _count_ users with 0 points" do
+      assert Repo.aggregate(Users.User, :count) == 0
+
+      Users.create_default(count: 2)
+
+      assert Repo.aggregate(Users.User, :count) == 2
+
+      users = Repo.all(Users.User)
+      assert Enum.all?(users, &(&1.points == 0))
     end
   end
 end

@@ -33,6 +33,18 @@ defmodule TwoInAMillion.Users do
     )
   end
 
+  def create_default(count: count) do
+    Ecto.Adapters.SQL.query!(
+      Repo,
+      """
+      INSERT INTO users(points, inserted_at, updated_at)
+      SELECT 0, NOW(), NOW()
+      FROM generate_series(1, $1)
+      """,
+      [count]
+    )
+  end
+
   @doc """
   Sets a new seed for the database random generator.
   """
