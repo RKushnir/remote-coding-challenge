@@ -29,16 +29,18 @@ defmodule TwoInAMillion.LotteryServer do
 
   @impl GenServer
   def init(arg) do
-    round_duration = Keyword.get(arg, :round_duration, default_round_duration())
-    number_generator = Keyword.get(arg, :number_generator, RandomNumberGenerator)
+    opts =
+      Keyword.merge(
+        default_options(),
+        Keyword.take(arg, [:round_duration, :number_generator, :randomize_points_fun])
+      )
 
     state = %State{
-      max_number:
-        Keyword.get_lazy(arg, :max_number, fn -> generate_random_number(number_generator) end),
+      max_number: Keyword.get(arg, :max_number, 0),
       timestamp: Keyword.get(arg, :timestamp)
     }
 
-    schedule_next_round(round_duration: round_duration, number_generator: number_generator)
+    schedule_next_round(opts)
 
     {:ok, state}
   end
@@ -61,10 +63,15 @@ defmodule TwoInAMillion.LotteryServer do
 
   @impl GenServer
   def handle_info({:start_new_round, opts}, state) do
-    Users.randomize_all_points(points_range())
+    number_generator = Keyword.fetch!(opts, :number_generator)
+    randomize_points_fun = Keyword.fetch!(opts, :randomize_points_fun)
+    new_max_number = generate_random_number(number_generator)
+
+    randomize_points_fun.(points_range())
     schedule_next_round(opts)
 
-    {:noreply, state}
+    new_state = %{state | max_number: new_max_number}
+    {:noreply, new_state}
   end
 
   defp schedule_next_round(opts) do
@@ -80,7 +87,13 @@ defmodule TwoInAMillion.LotteryServer do
   defp generate_random_number(number_generator),
     do: number_generator.get_next_number(points_range())
 
-  defp default_round_duration, do: fetch_config!(:round_duration)
+  defp default_options do
+    [
+      round_duration: fetch_config!(:round_duration),
+      number_generator: RandomNumberGenerator,
+      randomize_points_fun: &Users.randomize_all_points/1
+    ]
+  end
 
   defp points_range, do: fetch_config!(:points_range)
 

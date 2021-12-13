@@ -7,8 +7,9 @@ defmodule TwoInAMillion.LotteryServerTest do
 
   import Mox
 
-  def start_server(name, opts \\ []) do
+  defp start_server(name, opts \\ []) do
     opts = Keyword.put_new(opts, :max_number, 0)
+    opts = Keyword.put_new(opts, :randomize_points_fun, fn _ -> [] end)
     opts = Keyword.put(opts, :number_generator, RandomNumberGeneratorMock)
 
     server_spec = %{
@@ -20,6 +21,18 @@ defmodule TwoInAMillion.LotteryServerTest do
     Ecto.Adapters.SQL.Sandbox.allow(Repo, self(), server_pid)
     allow(RandomNumberGeneratorMock, self(), server_pid)
     server_pid
+  end
+
+  defp stub_next_random_number(next_number) do
+    RandomNumberGeneratorMock
+    |> stub(:get_next_number, fn _range -> next_number end)
+  end
+
+  setup :set_mox_from_context
+
+  setup do
+    stub_next_random_number(0)
+    :ok
   end
 
   describe "pick_winners/2" do
@@ -67,27 +80,57 @@ defmodule TwoInAMillion.LotteryServerTest do
     end
   end
 
-  test "regularly updates the points of users", %{test: unique_name} do
-    # Initialize with invalid value to guarantee that the points won't accidentally
-    # stay the same after the update.
-    user1 = create_user(points: -1)
-    round_duration = 100
-    points_range = Application.fetch_env!(:two_in_a_million, LotteryServer)[:points_range]
+  test "init/1 schedules periodic updates", %{test: unique_name} do
+    test_pid = self()
+    message_ref = make_ref()
 
-    start_server(unique_name, round_duration: round_duration)
+    fake_randomize_fun = fn _range ->
+      send(test_pid, {:randomize_called, message_ref})
+    end
 
-    Process.sleep(round_duration + 50)
+    start_server(unique_name, round_duration: 5, randomize_points_fun: fake_randomize_fun)
 
-    updated_user1 = reload_record(user1)
-    refute updated_user1.points == user1.points
-    assert updated_user1.points in points_range
+    assert_receive {:randomize_called, ^message_ref}
+    assert_receive {:randomize_called, ^message_ref}
+  end
 
-    user2 = create_user(points: -1)
+  describe "handle_info/2" do
+    test "updates the user points" do
+      test_pid = self()
+      message_ref = make_ref()
 
-    Process.sleep(round_duration + 50)
+      fake_randomize_fun = fn _range ->
+        send(test_pid, {:randomize_called, message_ref})
+      end
 
-    updated_user2 = reload_record(user2)
-    refute updated_user2.points == user2.points
-    assert updated_user2.points in points_range
+      state = %LotteryServer.State{}
+
+      opts = [
+        round_duration: 1_000,
+        number_generator: RandomNumberGeneratorMock,
+        randomize_points_fun: fake_randomize_fun
+      ]
+
+      LotteryServer.handle_info({:start_new_round, opts}, state)
+
+      assert_received {:randomize_called, ^message_ref}
+    end
+
+    test "updates the winning threshold" do
+      RandomNumberGeneratorMock
+      |> stub(:get_next_number, fn _range -> 20 end)
+
+      old_state = %LotteryServer.State{max_number: 0}
+
+      opts = [
+        round_duration: 1_000,
+        number_generator: RandomNumberGeneratorMock,
+        randomize_points_fun: fn _ -> [] end
+      ]
+
+      {_, new_state} = LotteryServer.handle_info({:start_new_round, opts}, old_state)
+
+      assert new_state.max_number == 20
+    end
   end
 end
